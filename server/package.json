@@ -1,0 +1,42 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "license": "MIT",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "scripts": {
+    "heroku-postbuild": "brunch build --production; knex migrate:latest",
+    "knex": "knex",
+    "lint": "eslint --ext .js --ignore-pattern public",
+    "start": "nodemon server.js",
+    "nf": "nf start"
+  },
+  "dependencies": {
+    "bcrypt-as-promised": "^1.1.0",
+    "body-parser": "^1.15.2",
+    "boom": "^4.2.0",
+    "cookie-parser": "^1.4.3",
+    "dotenv": "^2.0.0",
+    "express": "^4.14.0",
+    "express-validation": "^1.0.1",
+    "humps": "^2.0.0",
+    "joi": "^9.1.0",
+    "jsonwebtoken": "^7.1.9",
+    "knex": "^0.12.6",
+    "morgan": "^1.7.0",
+    "pg": "^6.1.0",
+    "request": "^2.79.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.4.0",
+    "eslint-config-ryansobol": "^9.1.1",
+    "foreman": "^2.0.0"
+  },
+  "engines": {
+    "node": "6.7.0"
+  }
+}
