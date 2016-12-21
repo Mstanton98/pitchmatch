@@ -23,23 +23,47 @@ passport.use(new FacebookStrategy({
 function(accessToken, refreshToken, profile, done) {
   User.findOrCreate(function(err, user) {
     if (err) { return done(err); }
-    done(null, user);
-  });
-  return knex('users')
-    .where('facebook_id', profile.id)
-    .first()
+    let fbProfile = null;
+
+    request({
+      url: `https://graph.facebook.com/me?access_token=${accessToken}`,
+    })
+    .then((res) => {
+      fbProfile = JSON.parse(res);
+      let newUser = {
+        firstName: fbProfile.first_name,
+        lastName: fbProfile.last_name,
+        facebookId: fbProfile.id,
+        facebookToken: accessToken
+      }
+
+      request({url: `https://graph.facebook.com/${fbProfile.id}?fields=id,name,picture`})
+      .then((full) => {
+        newUser.imgUrl = full.picture;
+      })
+      .catch((err) => {
+        done(err);
+      });
+
+      return knex('users')
+        .where('facebook_id', newUser.facebookId)
+        .first();
+    })
     .then((user) => {
       if (user) {
         return user;
       }
+
       return knex('users')
-      .insert(decamelizeKeys({
-        firstName: profile.familyName,
-        lastName: profile.givenName,
-        email: profile.emails.value,
-        facebookId: profile.id
-      }))
+        .insert(decamelizeKeys(newUser))
     })
+    .then((user) => {
+      done(null, camelizeKeys(user));
+    })
+    .catch((err) => {
+      done(err);
+    })
+  });
 }));
 
 router.get('/api/facebook', passport.authenticate('facebook'));
