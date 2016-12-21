@@ -13,11 +13,15 @@ const port = process.env.PORT || 8000;
 const server = require('http').createServer(app);
 const path = require('path');
 
+const auth = require('./routes/auth');
+
 app.disable('x-powered-by');
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+app.use(auth);
 
 app.use((_req, res) => {
   res.sendStatus(404);
