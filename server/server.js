@@ -12,6 +12,7 @@ const morgan = require('morgan');
 const port = process.env.PORT || 8000;
 const server = require('http').createServer(app);
 const path = require('path');
+const passport = require('passport');
 
 const auth = require('./routes/auth');
 
@@ -20,11 +21,27 @@ app.disable('x-powered-by');
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(cookieParser());
-
+app.use(passport.initialize());
+// just for test
+app.use(express.static('public'));
+//
+//
+//
+//
+//
+//
 app.use(auth);
 
 app.use((_req, res) => {
   res.sendStatus(404);
+});
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
 });
 
 app.use((err, _req, res, _next) => {
