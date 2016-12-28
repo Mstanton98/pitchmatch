@@ -15,7 +15,8 @@ const path = require('path');
 const passport = require('passport');
 
 const auth = require('./routes/auth');
-const messages = require('./routes/messages')
+const messages = require('./routes/messages');
+const matches = require('./routes/matches');
 
 app.disable('x-powered-by');
 
@@ -27,12 +28,9 @@ app.use(passport.initialize());
 app.use(express.static('public'));
 //
 //
-//
-//
-//
-//
 app.use(auth);
 app.use(messages);
+app.use(matches);
 
 app.use((_req, res) => {
   res.sendStatus(404);
