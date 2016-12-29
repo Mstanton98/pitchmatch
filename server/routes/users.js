@@ -23,4 +23,27 @@ const authorize = function(req, res, next) {
   });
 };
 
+router.get('/api/users', authorize, (req, res, next) => {
+  const id = req.token.userId;
+  console.log(id);
+//select all matches where user id is you
+//push match ids into array
+//get all users
+//for blah if
+  return knex('users')
+  .outerJoin('user_matches', 'users.id', 'user_matches.user_id')
+    .select('users.id', 'first_name', 'last_name', 'img_url', 'bio', 'instruments', 'project_type' )
+    .where('user_id', id)
+    // .whereNot('user.id', 'user_matches.user_id')
+    // .andWhereNot('bio', null)
+    .then((rows) => {
+
+      console.log(rows);
+      res.send(camelizeKeys(rows));
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
 module.exports = router;

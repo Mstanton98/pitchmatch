@@ -17,6 +17,7 @@ const passport = require('passport');
 const auth = require('./routes/auth');
 const messages = require('./routes/messages');
 const matches = require('./routes/matches');
+const users = require('./routes/users');
 
 app.disable('x-powered-by');
 
@@ -31,6 +32,7 @@ app.use(express.static('public'));
 app.use(auth);
 app.use(messages);
 app.use(matches);
+// app.use(users);
 
 app.use((_req, res) => {
   res.sendStatus(404);

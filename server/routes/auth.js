@@ -8,6 +8,7 @@ let callback = process.env.NODE_ENV === 'production' ? 'https://pitchmatch.herok
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const knex = require('../knex');
+const boom = require('boom');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const { camelizeKeys, decamelizeKeys } = require('humps');
@@ -90,7 +91,7 @@ router.get('/api/facebook/callback', passport.authenticate('facebook', {
 router.get('/api/users', authorize, (req, res, next) => {
   return knex('users')
     .then((response) => {
-      if (response) {
+      if (!response) {
         return next(boom.create(400, 'Failed to serve users.'));
       }
 

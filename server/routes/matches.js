@@ -23,7 +23,7 @@ const authorize = function(req, res, next) {
   });
 };
 
-router.get('/api/matches', authorize, (req, res) => {
+router.get('/api/matches', authorize, (req, res, next) => {
   const id = req.token.userId;
 
   return knex('user_matches')
@@ -39,6 +39,9 @@ router.get('/api/matches', authorize, (req, res) => {
 
       res.send(matches);
     })
+    .catch((err) => {
+      next(err);
+    });
 });
 
 router.post('/api/matches', authorize, (req, res, next) => {
