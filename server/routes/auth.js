@@ -90,6 +90,7 @@ router.get('/api/facebook/callback', passport.authenticate('facebook', {
 
 router.get('/api/users', authorize, (req, res, next) => {
   return knex('users')
+    .whereNot('id', req.token.userId)
     .then((response) => {
       if (!response) {
         return next(boom.create(400, 'Failed to serve users.'));

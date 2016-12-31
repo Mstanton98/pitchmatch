@@ -5,6 +5,8 @@
  */
 
 import React, { Component } from 'react';
+import StatusBar from './ioscomponents/StatusBar'
+import Main from './ioscomponents/Main';
 import {
   AppRegistry,
   StyleSheet,
@@ -16,9 +18,9 @@ export default class pitchmatch extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.stevenFuckhead}>
-          pitchmatch
-        </Text>
+        <StatusBar />
+        <Main />
+
       </View>
     );
   }
@@ -27,15 +29,7 @@ export default class pitchmatch extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#F5FCFF',
-  },
-  stevenFuckhead: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    color: 'purple',
-    fontSize: 40
   },
 });
 
