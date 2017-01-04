@@ -27,24 +27,33 @@ const authorize = function(req, res, next) {
   });
 };
 
-passport.use(new FacebookStrategy({
-  clientID: process.env.FACEBOOK_APP_ID,
-  clientSecret: process.env.FACEBOOK_APP_SECRET,
-  callbackURL: callback,
-  profileFields: ['name', 'photos']
-},
-function(accessToken, refreshToken, profile, done) {
+router.post('/api/auth', (req, res, next) => {
+  const accessToken = req.body.accessToken;
   let fbProfile = null;
+  let fbUser = {};
 
-  request({
-    url: `http://graph.facebook.com/${profile.id}/picture?type=large&redirect=false&width=480&height=480`
-  })
+  request({url: `https://graph.facebook.com/v2.8/me?fields=id%2Cfirst_name%2Clast_name&access_token=${accessToken}`})
   .then((res) => {
     fbProfile = JSON.parse(res);
 
-    return knex('users')
-    .where('facebook_id', profile.id)
-    .first();
+    fbUser = {
+      firstName: fbProfile.first_name,
+      lastName: fbProfile.last_name,
+      facebookId: fbProfile.id,
+      facebookToken: accessToken
+    };
+
+    return request({
+      url: `http://graph.facebook.com/${fbProfile.id}/picture?type=large&redirect=false&width=480&height=480`
+    })
+  })
+  .then((response) => {
+    const data = JSON.parse(response);
+
+    fbUser.imgUrl = data.data.url;
+
+    console.log(fbUser.imgUrl);
+
   })
   .then((user) => {
     if (user) {
@@ -52,57 +61,40 @@ function(accessToken, refreshToken, profile, done) {
     }
 
     return knex('users')
-    .insert(decamelizeKeys({
-      firstName: profile.name.givenName,
-      lastName: profile.name.familyName,
-      imgUrl: fbProfile.data.url,
-      facebookId: profile.id,
-      facebookToken: accessToken
-    }), '*');
+    .insert(decamelizeKeys(fbUser), '*')
   })
-  .then((user) => {
-    done(null, camelizeKeys(user));
+  .then((newUser) => {
+    const expiry = new Date(Date.now() + 1000 * 60 * 60 * 24 * 60);
+    const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, {
+      expiresIn: '60d'
+    });
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      expires: expiry,
+      secure: router.get('env') === 'production'
+    });
   })
   .catch((err) => {
-    done(err);
-  });
-}));
-
-router.get('/api/facebook', passport.authenticate('facebook', { session: false }));
-
-router.get('/api/facebook/callback', passport.authenticate('facebook', {
-  session: false,
-  failureRedirect: '/'
-}), (req, res) => {
-  const expiry = new Date(Date.now() + 1000 * 60 * 60 * 24 * 60);
-  const token = jwt.sign({ userId: req.user.id }, process.env.JWT_SECRET, {
-    expiresIn: '60d'
-  });
-
-  res.cookie('token', token, {
-    httpOnly: true,
-    expires: expiry,
-    secure: router.get('env') === 'production'
-  });
-
-  res.redirect('/');
+    next(err);
+  })
 });
 
 router.get('/api/users', authorize, (req, res, next) => {
   return knex('users')
-    .whereNot('id', req.token.userId)
-    .then((response) => {
-      if (!response) {
-        return next(boom.create(400, 'Failed to serve users.'));
-      }
+  .whereNot('id', req.token.userId)
+  .then((response) => {
+    if (!response) {
+      return next(boom.create(400, 'Failed to serve users.'));
+    }
 
-      const users = camelizeKeys(response);
+    const users = camelizeKeys(response);
 
-      res.send(users);
-    })
-    .catch((err) => {
-      next(err);
-    });
+    res.send(users);
+  })
+  .catch((err) => {
+    next(err);
+  });
 });
 
 module.exports = router;
