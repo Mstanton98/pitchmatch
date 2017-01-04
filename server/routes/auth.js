@@ -52,8 +52,9 @@ router.post('/api/auth', (req, res, next) => {
 
     fbUser.imgUrl = data.data.url;
 
-    console.log(fbUser.imgUrl);
-
+    return knex('users')
+    .where('facebook_id', fbProfile.id)
+    .first();
   })
   .then((user) => {
     if (user) {
@@ -64,13 +65,13 @@ router.post('/api/auth', (req, res, next) => {
     .insert(decamelizeKeys(fbUser), '*')
   })
   .then((newUser) => {
-    const expiry = new Date(Date.now() + 1000 * 60 * 60 * 24 * 60);
+    const expiry = new Date(Date.now() + 1000 * 60 * 60 * 24 * 90);
     const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, {
-      expiresIn: '60d'
+      expiresIn: '90d'
     });
 
-    res.cookie('token', token, {
-      httpOnly: true,
+    res.send({
+      token: token,
       expires: expiry,
       secure: router.get('env') === 'production'
     });
@@ -86,6 +87,23 @@ router.get('/api/users', authorize, (req, res, next) => {
   .then((response) => {
     if (!response) {
       return next(boom.create(400, 'Failed to serve users.'));
+    }
+
+    const users = camelizeKeys(response);
+
+    res.send(users);
+  })
+  .catch((err) => {
+    next(err);
+  });
+});
+
+router.get('/api/users', authorize, (req, res, next) => {
+  return knex('users')
+  .where('id', req.token.userId)
+  .then((response) => {
+    if (!response) {
+      return next(boom.create(400, 'Failed to serve user.'));
     }
 
     const users = camelizeKeys(response);

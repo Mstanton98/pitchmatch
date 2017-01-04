@@ -6,11 +6,28 @@ import Auth from './Auth';
 import {
   StyleSheet,
   Text,
-  View
+  View,
+  AsyncStorage,
 } from 'react-native';
 
 
 export default class Main extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      accessToken: '',
+    };
+  }
+
+  async getToken() {
+    try {
+      let token = await AsyncStorage.getItem(STORAGE_KEY);
+      return this.setState({ accessToken: token });
+    } catch (error) {
+      console.log('AsyncStorage error: ' + error.message);
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>

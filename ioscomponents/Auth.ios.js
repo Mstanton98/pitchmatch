@@ -9,7 +9,22 @@ import {
 
 import { LoginButton, AccessToken } from 'react-native-fbsdk';
 
+let STORAGE_KEY = 'id_token';
+
 export default class Auth extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  async _onValueChange(item, selectedValue) {
+   try {
+    await AsyncStorage.setItem(item, selectedValue);
+   } catch (error) {
+     console.log('AsyncStorage error: ' + error.message);
+   }
+ }
+
   render() {
     return (
       <View
@@ -31,21 +46,25 @@ export default class Auth extends Component {
                   alert("login is cancelled.");
                 } else {
                   AccessToken.getCurrentAccessToken().then(
-                    (data) => {
-                      let token = data.accessToken;
+                    (res) => {
 
+                      let token = res.accessToken;
+                      console.log(token);
                       fetch('http://localhost:8000/api/auth', {
                         method: 'POST',
                         headers: {
-                          'Accept': 'application/json',
                           'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
                           accessToken: token,
                         })
                       })
+                      .then(response => response.json())
                       .then((res) => {
-                        console.log(res);
+                        if (res.token) {
+                          
+                        this._onValueChange(STORAGE_KEY, res.token);
+                        }
                       })
                       .catch((err) => {
                         alert(err);
@@ -64,7 +83,6 @@ export default class Auth extends Component {
     const styles = StyleSheet.create({
       container: {
         flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
       },
       title: {
