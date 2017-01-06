@@ -7,6 +7,9 @@ import {
 
 export default class UserView extends Component {
   render() {
+    
+    console.log(this.props);
+
     return (
       <Text>
         UserView

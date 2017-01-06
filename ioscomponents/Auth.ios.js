@@ -5,6 +5,7 @@ import {
   View,
   Image,
   AsyncStorage,
+  ScrollView
 } from 'react-native';
 
 import { LoginButton, AccessToken } from 'react-native-fbsdk';
@@ -18,64 +19,71 @@ export default class Auth extends Component {
   }
 
   async _onValueChange(item, selectedValue) {
-   try {
-    await AsyncStorage.setItem(item, selectedValue);
-   } catch (error) {
-     console.log('AsyncStorage error: ' + error.message);
-   }
- }
+    try {
+      await AsyncStorage.setItem(item, selectedValue);
+    } catch (error) {
+      console.log('AsyncStorage error: ' + error.message);
+    }
+  }
 
   render() {
+    console.log(this.props.token);
+    // if (this.props.token) {
+    //   return this.props.navigator.push({ ident: 'editProfile'});
+    // }
     return (
-      <View
-        style={styles.container}
-        >
-          <Text style={styles.title}>pitchmatch</Text>
-          <Text style={styles.description}>Musical collaboration a few taps away.</Text>
-          <Image
-            style={styles.logo}
-            source={require('./img/logo.png')}
-          />
-          <LoginButton
-            publishPermissions={["publish_actions"]}
-            onLoginFinished={
-              (error, result) => {
-                if (error) {
-                  alert("login has error: " + result.error);
-                } else if (result.isCancelled) {
-                  alert("login is cancelled.");
-                } else {
-                  AccessToken.getCurrentAccessToken().then(
-                    (res) => {
+      <ScrollView style={{ flex: 1 }}>
 
-                      let token = res.accessToken;
-                      console.log(token);
-                      fetch('http://localhost:8000/api/auth', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                          accessToken: token,
+        <View
+          style={styles.container}
+          >
+            <Text style={styles.title}>pitchmatch</Text>
+            <Text style={styles.description}>Musical collaboration a few taps away.</Text>
+            <Image
+              style={styles.logo}
+              source={require('./img/logo.png')}
+            />
+            <LoginButton
+              publishPermissions={["publish_actions"]}
+              onLoginFinished={
+                (error, result) => {
+                  if (error) {
+                    alert("login has error: " + result.error);
+                  } else if (result.isCancelled) {
+                    alert("login is cancelled.");
+                  } else {
+                    AccessToken.getCurrentAccessToken().then(
+                      (res) => {
+                        let token = res.accessToken;
+
+                        fetch('http://localhost:8000/api/auth', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            accessToken: token,
+                          })
                         })
-                      })
-                      .then(response => response.json())
-                      .then((res) => {
-                        if (res.token) {
-                          
-                        this._onValueChange(STORAGE_KEY, res.token);
-                        }
-                      })
-                      .catch((err) => {
-                        alert(err);
-                      })
-                    }
-                  )
+                        .then(response => response.json())
+                        .then((res) => {
+                          if (res.token) {
+
+                            this._onValueChange(STORAGE_KEY, res.token);
+                          }
+
+                        })
+                        .catch((err) => {
+                          alert(err);
+                        })
+                      }
+                    )
+                  }
                 }
               }
-            }
-            onLogoutFinished={() => console.log('done')}/>
-          </View>
+              onLogoutFinished={() => console.log('done')}/>
+            </View>
+          </ScrollView>
         );
       }
     }
