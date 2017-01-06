@@ -32,7 +32,7 @@ router.patch('/api/details', authorize, (req, res, next) => {
     .where('id', req.body.userId)
     .update({bio: req.body.bio, instruments: req.body.instruments, project_type: req.body.projectType})
     .then((response) => {
-      
+
       res.send(true);
     })
     .catch((err) => {
@@ -78,8 +78,16 @@ router.post('/api/auth', (req, res, next) => {
     .insert(decamelizeKeys(fbUser), '*')
   })
   .then((newUser) => {
+    let userId;
+    if (newUser.id) {
+      userId = newUser.id;
+    }
+    else {
+      userId = newUser[0].id;
+    }
+
     const expiry = new Date(Date.now() + 1000 * 60 * 60 * 24 * 90);
-    const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: userId }, process.env.JWT_SECRET, {
       expiresIn: '90d'
     });
 

@@ -46,7 +46,6 @@ export default class Main extends Component {
         console.log(err);
       });
 
-
       await fetch('http://localhost:8000/api/users', {
         method: 'GET',
         headers: {
@@ -56,13 +55,12 @@ export default class Main extends Component {
       })
       .then(response => response.json())
       .then((res) => {
-        console.log(res);
+
         this.setState({ users: res });
       })
       .catch((err) => {
         console.log(err);
       });
-      this.render()
 
     }
   }
@@ -116,7 +114,17 @@ export default class Main extends Component {
               return <UserView
                 navigator={navigator}
                 user={this.state.userInfo}
+                users={this.state.users}
+                matches={this.state.matches}
                 token={this.state.accessToken}
+              />;
+            }
+            if (route.ident === 'MatchList') {
+              return <MatchList
+                navigator={navigator}
+                user={this.state.userInfo}
+                token={this.state.accessToken}
+                matches={this.state.matches}
               />;
             }
           }}
