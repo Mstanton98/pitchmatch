@@ -27,10 +27,6 @@ export default class Auth extends Component {
   }
 
   render() {
-    console.log(this.props.token);
-    // if (this.props.token) {
-    //   return this.props.navigator.push({ ident: 'editProfile'});
-    // }
     return (
       <ScrollView style={{ flex: 1 }}>
 
@@ -70,6 +66,11 @@ export default class Auth extends Component {
                           if (res.token) {
 
                             this._onValueChange(STORAGE_KEY, res.token);
+                            this.props.navigator.pop();
+                            this.props.navigator.push({ident: 'UserView'});
+                            // this.props.navigator.replaceAtIndex({ident: 'UserView'}, 0);
+                            // this.props.navigator.popToTop(0);
+
                           }
 
                         })
@@ -81,7 +82,8 @@ export default class Auth extends Component {
                   }
                 }
               }
-              onLogoutFinished={() => console.log('done')}/>
+              // onLogoutFinished={() => console.log('done')}
+            />
             </View>
           </ScrollView>
         );

@@ -7,8 +7,10 @@ import {
   TextInput,
   Picker,
   ScrollView,
-  Button
+  Button,
+  TouchableOpacity
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Octicons';
 
 const Item = Picker.Item;
 
@@ -34,7 +36,6 @@ export default class EditProfile extends Component {
   }
 
   onValueChange(value) {
-    console.log(this.props);
 
     this.setState({ projectType: value });
   }
@@ -68,9 +69,13 @@ export default class EditProfile extends Component {
     });
   }
 
-  render() {
+  delToken() {
+    this.props.delToken();
+    this.props.navigator.replaceAtIndex({ident: 'Auth'}, 0);
+    this.props.navigator.popToTop(0);
+  }
 
-    console.log(this.props.user);
+  render() {
     return (
       <ScrollView>
       <ScrollView contentContainerStyle={styles.container}
@@ -78,6 +83,18 @@ export default class EditProfile extends Component {
         pagingEnabled={true}
         automaticallyAdjustContentInsets={false}
         >
+          <TouchableOpacity style={styles.x}
+            onPress={() => {
+              if (this.props.user.bio) {
+                this.props.navigator.pop();
+              }
+              else {
+                this.delToken();
+              }
+            }}
+          >
+            <Icon name="x" size={36} color="#3B2338" />
+          </TouchableOpacity>
         <Image
           style={styles.userImg}
           source={{uri: this.props.user.imgUrl}}
@@ -107,7 +124,7 @@ export default class EditProfile extends Component {
           placeholderTextColor='#7C7382'
           value={this.state.instruments}
           onChangeText={(instruments) => this.setState({instruments})}
-          maxLength={255}
+          maxLength={100}
         />
         <Text style={styles.label}>Type of Project</Text>
         <Picker
@@ -121,10 +138,24 @@ export default class EditProfile extends Component {
           <Item label="Studio Session" value="Studio Session" />
           <Item label="Any" value="Any" />
         </Picker>
+        <View
+          style={styles.button}
+          >
+          <Button
+            color={"#3B2338"}
+            title={'Save your changes'}
+            onPress={this.updateDetails.bind(this)}
+          />
+      </View>
+      <View
+        style={styles.button}
+        >
         <Button
-          title={'Save your changes'}
-          onPress={this.updateDetails.bind(this)}
+          color={"#3B2338"}
+          title={'Log Out'}
+          onPress={this.delToken.bind(this)}
         />
+      </View>
       </ScrollView>
       </ScrollView>
 
@@ -135,7 +166,6 @@ export default class EditProfile extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 15,
     alignItems: 'center',
     marginBottom: 100
   },
@@ -154,7 +184,7 @@ const styles = StyleSheet.create({
     margin: 20
   },
   bio: {
-    height: 80,
+    height: 130,
     width: 340,
     borderRadius: 10,
     borderWidth: 2,
@@ -165,7 +195,7 @@ const styles = StyleSheet.create({
   },
   instruments: {
     borderRadius: 10,
-    height: 40,
+    height: 70,
     width: 340,
     fontSize: 16,
     borderWidth: 2,
@@ -183,6 +213,17 @@ const styles = StyleSheet.create({
   },
   item: {
     color: '#70587C'
+  },
+  button: {
+    height: 40,
+    width: 180,
+    borderWidth: 1,
+    borderRadius: 20,
+    marginBottom: 10
+  },
+  x: {
+    flex: 1,
+    alignSelf: 'flex-start'
   }
 
 });
