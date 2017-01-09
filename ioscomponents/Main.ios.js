@@ -24,45 +24,54 @@ export default class Main extends Component {
       users: [],
       matches: [],
     };
+    this.getToken = this.getToken.bind(this);
+    this.delToken = this.delToken.bind(this);
+    this.getUsers = this.getUsers.bind(this);
+    this.getInfo = this.getInfo.bind(this);
   }
 
-  async componentDidMount() {
-    await this.getToken();
+  componentDidMount() {
+    this.getToken();
+    console.log('mounting-----------');
+  }
 
-    if (this.state.accessToken) {
-      await fetch('http://localhost:8000/api/userInfo', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          cookie: `token=${this.state.accessToken}`
-        }
-      })
-      .then(response => response.json())
-      .then((res) => {
+  getUsers() {
+    return fetch('http://localhost:8000/api/users', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        cookie: `token=${this.state.accessToken}`
+      }
+    })
+    .then(response => response.json())
+    .then((res) => {
+      this.setState({ users: res });
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+  }
 
-        this.setState({ userInfo: res[0] });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  getInfo() {
 
-      await fetch('http://localhost:8000/api/users', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          cookie: `token=${this.state.accessToken}`
-        }
-      })
-      .then(response => response.json())
-      .then((res) => {
+    console.log('Get Info -------------');
+    return fetch('http://localhost:8000/api/userInfo', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        cookie: `token=${this.state.accessToken}`
+      }
+    })
+    .then(response => response.json())
+    .then((res) => {
 
-        this.setState({ users: res });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      console.log(res, 'GETINFOOOOOOO');
+      this.setState({ userInfo: res[0] });
+    })
+    .catch((err) => {
+      console.log(err);
+    })
 
-    }
   }
 
   async getToken() {
@@ -86,37 +95,48 @@ export default class Main extends Component {
   }
 
   render() {
+    console.log("MAIN STATE LOADED---------------", this.state);
     return (
       <View style={styles.container}>
         <Navigator
           style={{ flex: 1 }}
-          initialRoute={{}}
+          initialRoute={{ident: 'Auth'}}
           configureScene={(route) => ({
             ...route.sceneConfig || Navigator.SceneConfigs.FloatFromRight }
           )}
           renderScene={(route, navigator) => {
-            if (!this.state.accessToken || route.ident === 'Auth') {
+            if (route.ident === 'Auth') {
               return <Auth
                 navigator={navigator}
                 token={this.state.accessToken}
+                getToken={this.getToken}
+                delToken={this.delToken}
               />;
             }
-            if (this.state.accessToken && !this.state.userInfo.bio || route.ident === 'EditProfile') {
+            if (route.ident === 'EditProfile') {
+              console.log('Main -  EP');
+              // if (!this.state.user) {
+              //   return null;
+              // }
+              // else
               return <EditProfile
                 navigator={navigator}
                 user={this.state.userInfo}
                 token={this.state.accessToken}
                 delToken={this.delToken}
+                getUsers={this.getUsers}
+                getInfo={this.getInfo}
               />;
-
             }
-            if (this.state.accessToken && this.state.userInfo.bio || route.ident === 'UserView') {
+            if (this.state.accessToken && route.ident === 'UserView') {
               return <UserView
                 navigator={navigator}
                 user={this.state.userInfo}
                 users={this.state.users}
                 matches={this.state.matches}
                 token={this.state.accessToken}
+                getUsers={this.getUsers}
+                getInfo={this.getInfo}
               />;
             }
             if (route.ident === 'MatchList') {
@@ -125,6 +145,8 @@ export default class Main extends Component {
                 user={this.state.userInfo}
                 token={this.state.accessToken}
                 matches={this.state.matches}
+                getUsers={this.getUsers}
+                getInfo={this.getInfo}
               />;
             }
           }}

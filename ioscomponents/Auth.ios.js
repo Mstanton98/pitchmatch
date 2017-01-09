@@ -5,7 +5,8 @@ import {
   View,
   Image,
   AsyncStorage,
-  ScrollView
+  ScrollView,
+  Navigator
 } from 'react-native';
 
 import { LoginButton, AccessToken } from 'react-native-fbsdk';
@@ -28,10 +29,10 @@ export default class Auth extends Component {
 
   render() {
     return (
-      <ScrollView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
 
-        <View
-          style={styles.container}
+        <ScrollView
+          contentContainerStyle={styles.container}
           >
             <Text style={styles.title}>pitchmatch</Text>
             <Text style={styles.description}>Musical collaboration a few taps away.</Text>
@@ -64,28 +65,25 @@ export default class Auth extends Component {
                         .then(response => response.json())
                         .then((res) => {
                           if (res.token) {
-
                             this._onValueChange(STORAGE_KEY, res.token);
-                            this.props.navigator.pop();
-                            this.props.navigator.push({ident: 'UserView'});
-                            // this.props.navigator.replaceAtIndex({ident: 'UserView'}, 0);
-                            // this.props.navigator.popToTop(0);
+                            this.props.getToken();
 
+                            this.props.navigator.push({ident: 'UserView', sceneConfig: Navigator.SceneConfigs.FloatFromBottom});
                           }
 
                         })
                         .catch((err) => {
-                          alert(err);
+                          console.log(err);
                         })
                       }
                     )
                   }
                 }
               }
-              // onLogoutFinished={() => console.log('done')}
+              onLogoutFinished={() => this.props.delToken()}
             />
-            </View>
           </ScrollView>
+          </View>
         );
       }
     }
@@ -94,6 +92,8 @@ export default class Auth extends Component {
       container: {
         flex: 1,
         alignItems: 'center',
+        backgroundColor: 'white',
+        height: 800
       },
       title: {
         fontSize: 48,

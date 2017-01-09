@@ -103,8 +103,13 @@ router.post('/api/auth', (req, res, next) => {
 });
 
 router.get('/api/users', authorize, (req, res, next) => {
-  return knex('users')
-  .whereNot('id', req.token.userId)
+  const subquery = knex('user_matches')
+    .select('match_id')
+    .where('user_id', req.token.userId);
+    console.log(req.token.userId);
+  knex('users')
+  .whereNotIn('id', subquery)
+  .andWhereNot('id', req.token.userId)
   .then((response) => {
     if (!response) {
       return next(boom.create(400, 'Failed to serve users.'));

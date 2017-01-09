@@ -18,28 +18,14 @@ import Icon from 'react-native-vector-icons/Octicons';
 export default class UserView extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-
-    }
+    this.state = {};
+    this.onPress = this.onPress.bind(this);
+    this.onPress2 = this.onPress2.bind(this);
   }
 
   componentDidMount() {
-    // if (!this.props.user.bio) {
-    //   this.props.navigator.replaceAtIndex({ident: 'EditProfile', sceneConfig: Navigator.SceneConfigs.FloatFromBottom}, 0);
-    //   this.props.navigator.popToTop(0);
-    // }
-  }
-
-  userSort() {
-    let sorted = [];
-
-    for (let i = 0; i < this.props.matches.length; i++) {
-      if (this.props.matches[i].id !== this.props.users[this.props.users.length - 1].id) {
-        this.props.users.pop();
-      }
-    }
-    return sorted;
+    this.props.getUsers();
+    this.props.getInfo();
   }
 
   onPress() {
@@ -51,9 +37,13 @@ export default class UserView extends Component {
   }
 
   render() {
-    this.userSort();
-    console.log(this.props);
-    return (
+    if (this.props.user && !this.props.user.bio) {
+    return <ScrollView style={styles.container}>
+        <TouchableOpacity style={styles.getStart} onPress={this.onPress}>
+          <Text style={styles.getStartButton}>Get started </Text>
+        </TouchableOpacity>
+      </ScrollView>
+    } else return (
       <View style={{flex: 1}}>
       <ScrollView style={styles.container}>
 
@@ -88,13 +78,14 @@ export default class UserView extends Component {
           marginTop: 20,
           marginBottom: 20,
           marginLeft: 40,
-          marginRight: 40
+          marginRight: 40,
+          height: 80
         }}
       >
-        <TouchableOpacity style={styles.thumbsup} onPress={this.onPress.bind(this)}>
+        <TouchableOpacity style={styles.thumbsup} onPress={this.onPress}>
           <Icon name="thumbsdown" size={36} color="black" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.thumbsdown} onPress={this.onPress.bind(this)}>
+        <TouchableOpacity style={styles.thumbsdown} onPress={this.onPress}>
           <Icon name="thumbsup" size={36} color="black" />
         </TouchableOpacity>
       </View>
@@ -104,11 +95,11 @@ export default class UserView extends Component {
       </ScrollView>
 
       <View style={styles.navbar}>
-        <TouchableOpacity style={styles.profileButton} onPress={this.onPress.bind(this)}>
+        <TouchableOpacity style={styles.profileButton} onPress={this.onPress}>
           <Icon name="person" size={36} color="black" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.profileButton} onPress={this.onPress2.bind(this)}>
+        <TouchableOpacity style={styles.profileButton} onPress={this.onPress2}>
           <Icon name="comment" size={36} color="black" />
         </TouchableOpacity>
 
@@ -121,15 +112,14 @@ export default class UserView extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: .9,
-    // height: 600
-
+    backgroundColor: 'white'
   },
   userContainer: {
     flex: 1,
     borderWidth: 2,
     borderColor: '#70587B',
     height: 400,
-    margin: 30,
+    margin: 20,
     borderRadius: 40,
   },
   navbar: {
@@ -168,7 +158,21 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     padding: 20,
     marginLeft: 100
-
+  },
+  getStart: {
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 250,
+    borderWidth: 15,
+    borderColor: '#70587B',
+    borderRadius: 50
+  },
+  getStartButton: {
+    fontSize: 50,
+    fontFamily: 'Avenir',
+    backgroundColor: '#70587B',
+    color: 'black'
   }
 
 });
