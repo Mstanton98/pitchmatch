@@ -32,7 +32,6 @@ export default class EditProfile extends Component {
   }
 
   componentDidMount() {
-    console.log('EP Mounting----------');
     if (!this.props.user) {
       return this.render();
     }
@@ -85,9 +84,6 @@ export default class EditProfile extends Component {
   }
 
   render() {
-    console.log('Edit Profile Render---------');
-    console.log('STATE:', this.state)
-    console.log('PROPS:', this.props)
     return (
       <ScrollView style={{backgroundColor: 'white'}}>
         <ScrollView contentContainerStyle={styles.container}
@@ -150,24 +146,22 @@ export default class EditProfile extends Component {
                   <Item label="Studio Session" value="Studio Session" />
                   <Item label="Any" value="Any" />
                 </Picker>
-                <View
+                <TouchableOpacity
                   style={styles.button}
+                  onPress={this.updateDetails}
                   >
-                    <Button
-                      color={"#3B2338"}
-                      title={'Save your changes'}
-                      onPress={this.updateDetails}
-                    />
-                  </View>
-                  <View
+                    <Text style={styles.buttonText}>
+                      Save your changes
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
                     style={styles.button}
+                    onPress={this.backToAuth}
                     >
-                      <Button
-                        color={"#3B2338"}
-                        title={'Back to login'}
-                        onPress={this.backToAuth}
-                      />
-                    </View>
+                      <Text style={styles.buttonText}>
+                        Back to login
+                    </Text>
+                    </TouchableOpacity>
                   </ScrollView>
                 </ScrollView>
 
@@ -231,9 +225,20 @@ export default class EditProfile extends Component {
             button: {
               height: 40,
               width: 180,
-              borderWidth: 1,
-              borderRadius: 20,
-              marginBottom: 10
+              borderWidth: 3,
+              borderRadius: 90,
+              marginBottom: 10,
+              alignSelf: 'center',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderColor: '#70587B',
+              backgroundColor: '#70587C'
+            },
+            buttonText: {
+              color: 'white',
+              fontFamily: 'Avenir',
+              fontSize: 20,
+              backgroundColor: '#70587C'
             },
             x: {
               flex: 1,

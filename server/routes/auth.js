@@ -110,6 +110,7 @@ router.get('/api/users', authorize, (req, res, next) => {
   knex('users')
   .whereNotIn('id', subquery)
   .andWhereNot('id', req.token.userId)
+  .andWhereNot('bio', '')
   .then((response) => {
     if (!response) {
       return next(boom.create(400, 'Failed to serve users.'));

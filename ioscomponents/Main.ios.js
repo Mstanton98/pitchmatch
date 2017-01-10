@@ -17,7 +17,6 @@ import {
 export default class Main extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       accessToken: '',
       userInfo: {},
@@ -28,11 +27,13 @@ export default class Main extends Component {
     this.delToken = this.delToken.bind(this);
     this.getUsers = this.getUsers.bind(this);
     this.getInfo = this.getInfo.bind(this);
+    this.updateUser
+    this.onPress = this.onPress.bind(this);
+    this.onPress2 = this.onPress2.bind(this);
   }
 
   componentDidMount() {
     this.getToken();
-    console.log('mounting-----------');
   }
 
   getUsers() {
@@ -53,8 +54,6 @@ export default class Main extends Component {
   }
 
   getInfo() {
-
-    console.log('Get Info -------------');
     return fetch('http://localhost:8000/api/userInfo', {
       method: 'GET',
       headers: {
@@ -65,7 +64,6 @@ export default class Main extends Component {
     .then(response => response.json())
     .then((res) => {
 
-      console.log(res, 'GETINFOOOOOOO');
       this.setState({ userInfo: res[0] });
     })
     .catch((err) => {
@@ -94,8 +92,21 @@ export default class Main extends Component {
     }
   }
 
+  userUpdate() {
+
+    let newArr = this.state.users.slice(0, newArr.length - 2);
+    this.setState({ users: newArr });
+  }
+
+  onPress() {
+    this.navigator.push({ident: 'MatchList', sceneConfig: Navigator.SceneConfigs.FloatFromRight});
+  }
+
+  onPress2() {
+    this.navigator.pop();
+  }
+
   render() {
-    console.log("MAIN STATE LOADED---------------", this.state);
     return (
       <View style={styles.container}>
         <Navigator
@@ -114,11 +125,6 @@ export default class Main extends Component {
               />;
             }
             if (route.ident === 'EditProfile') {
-              console.log('Main -  EP');
-              // if (!this.state.user) {
-              //   return null;
-              // }
-              // else
               return <EditProfile
                 navigator={navigator}
                 user={this.state.userInfo}
@@ -149,6 +155,16 @@ export default class Main extends Component {
                 getInfo={this.getInfo}
               />;
             }
+          if (route.ident === 'MatchNotification') {
+            return <ScrollView style={styles.notificationCont}>
+                <TouchableOpacity style={styles.notification} onPress={this.onPress}>
+                  <Text style={styles.button}>Check them out</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.notification2} onPress={this.onPress2}>
+                  <Text style={styles.button}>Go away</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            }
           }}
         />
       </View>
@@ -160,6 +176,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: 40,
+  },
+  notificationCont: {
+    flex: 1,
+    backgroundColor: 'white'
+  },
+  notification: {
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 250,
+    borderWidth: 15,
+    borderColor: '#70587B',
+    borderRadius: 50
+  },
+  notification2: {
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 50,
+    borderWidth: 15,
+    borderColor: '#70587B',
+    borderRadius: 50
+  },
+  button: {
+    fontSize: 50,
+    fontFamily: 'Avenir',
+    backgroundColor: '#70587B',
+    color: 'black'
   }
 });
 
