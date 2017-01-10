@@ -23,6 +23,26 @@ const authorize = function(req, res, next) {
   });
 };
 
+router.post('/api/messagesList', authorize, (req, res, next) => {
+  const id = req.token.userId;
+  const matchId = req.body.matchId;
+  console.log(id);
+
+  return knex('user_messages')
+    .where('user_id', id)
+    .andWhere('match_id', matchId)
+    orWhere('match_id', id)
+    andWhere('user_id', matchId)
+    .then((response) => {
+      const messages = camelizeKeys(response);
+
+      res.send(messages);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
 router.post('/api/messages', authorize, (req, res, next) => {
   const id = req.token.userId;
   const recipientId = req.body.recipientId;
@@ -51,31 +71,6 @@ router.post('/api/messages', authorize, (req, res, next) => {
         .catch((err) => {
           next(err);
         });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
-
-router.post('/api/messageList', authorize, (req, res, next) => {
-  const id = req.token.userId;
-
-  return knex('user_messages')
-    .innerJoin('users', 'users.id', 'user_messages.match_id')
-    .where('user_id', id)
-    .orWhere('match_id', id)
-    .then((rows) => {
-      if (!rows) {
-        return boom.create(404, 'User has no messages.');
-      }
-
-      const messages = camelizeKeys(rows);
-
-      for (let i = 0; i < messages.length; i++) {
-        delete messages[i].facebookToken;
-      }
-
-      res.send(messages);
     })
     .catch((err) => {
       next(err);

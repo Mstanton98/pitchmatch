@@ -4,13 +4,15 @@ import UserView from './UserView';
 import Auth from './Auth';
 import ChatView from './ChatView';
 import MatchList from './MatchList';
-import UserProfile from './UserProfile';
 import {
   StyleSheet,
   Text,
   View,
   AsyncStorage,
-  Navigator
+  Navigator,
+  ScrollView,
+  TouchableOpacity,
+  Image
 } from 'react-native';
 
 
@@ -27,7 +29,8 @@ export default class Main extends Component {
     this.delToken = this.delToken.bind(this);
     this.getUsers = this.getUsers.bind(this);
     this.getInfo = this.getInfo.bind(this);
-    this.updateUser
+    this.getMatches = this.getMatches.bind(this);
+    this.userUpdate = this.userUpdate.bind(this);
     this.onPress = this.onPress.bind(this);
     this.onPress2 = this.onPress2.bind(this);
   }
@@ -46,6 +49,7 @@ export default class Main extends Component {
     })
     .then(response => response.json())
     .then((res) => {
+
       this.setState({ users: res });
     })
     .catch((err) => {
@@ -69,7 +73,24 @@ export default class Main extends Component {
     .catch((err) => {
       console.log(err);
     })
+  }
 
+  getMatches() {
+    return fetch('http://localhost:8000/api/matches', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        cookie: `token=${this.state.accessToken}`
+      }
+    })
+    .then(response => response.json())
+    .then((res) => {
+
+      this.setState({ matches: res });
+    })
+    .catch((err) => {
+      console.log(err);
+    })
   }
 
   async getToken() {
@@ -94,26 +115,30 @@ export default class Main extends Component {
 
   userUpdate() {
 
-    let newArr = this.state.users.slice(0, newArr.length - 2);
+    let newArr = [...this.state.users];
+    newArr.pop();
     this.setState({ users: newArr });
   }
 
   onPress() {
-    this.navigator.push({ident: 'MatchList', sceneConfig: Navigator.SceneConfigs.FloatFromRight});
+    this.refs.navigator.immediatelyResetRouteStack([{ident: 'UserView'}, {ident: 'MatchList', sceneConfig: Navigator.SceneConfigs.FloatFromRight}]);
   }
 
   onPress2() {
-    this.navigator.pop();
+    this.refs.navigator.pop();
   }
 
   render() {
     return (
       <View style={styles.container}>
         <Navigator
+          ref='navigator'
           style={{ flex: 1 }}
           initialRoute={{ident: 'Auth'}}
           configureScene={(route) => ({
-            ...route.sceneConfig || Navigator.SceneConfigs.FloatFromRight }
+            ...route.sceneConfig || Navigator.SceneConfigs.FloatFromRight,
+            gestures: route.gestures
+           }
           )}
           renderScene={(route, navigator) => {
             if (route.ident === 'Auth') {
@@ -139,9 +164,11 @@ export default class Main extends Component {
                 navigator={navigator}
                 user={this.state.userInfo}
                 users={this.state.users}
+                userUpdate={this.userUpdate}
                 matches={this.state.matches}
                 token={this.state.accessToken}
                 getUsers={this.getUsers}
+                getMatches={this.getMatches}
                 getInfo={this.getInfo}
               />;
             }
@@ -155,13 +182,20 @@ export default class Main extends Component {
                 getInfo={this.getInfo}
               />;
             }
+            if (route.ident === 'ChatView') {
+              return <ChatView
+                user={route.user}
+              />
+            }
           if (route.ident === 'MatchNotification') {
             return <ScrollView style={styles.notificationCont}>
+                <Text style={{fontFamily: 'Avenir', fontSize: 30, alignSelf: 'center'}}>You matched with {route.firstName}!</Text>
+                <Image style={styles.userImg} source={{uri: route.imgUrl }} />
                 <TouchableOpacity style={styles.notification} onPress={this.onPress}>
                   <Text style={styles.button}>Check them out</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.notification2} onPress={this.onPress2}>
-                  <Text style={styles.button}>Go away</Text>
+                  <Text style={styles.button2}>Go Away</Text>
                 </TouchableOpacity>
               </ScrollView>
             }
@@ -181,11 +215,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white'
   },
+  userImg: {
+    marginTop: 25,
+    borderRadius: 125,
+    height: 250,
+    width: 250,
+    alignSelf: 'center'
+  },
   notification: {
     alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 250,
+    marginTop: 75,
     borderWidth: 15,
     borderColor: '#70587B',
     borderRadius: 50
@@ -200,7 +241,13 @@ const styles = StyleSheet.create({
     borderRadius: 50
   },
   button: {
-    fontSize: 50,
+    fontSize: 30,
+    fontFamily: 'Avenir',
+    backgroundColor: '#70587B',
+    color: 'black'
+  },
+  button2: {
+    fontSize: 30,
     fontFamily: 'Avenir',
     backgroundColor: '#70587B',
     color: 'black'

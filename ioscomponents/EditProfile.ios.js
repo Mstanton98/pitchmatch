@@ -8,7 +8,8 @@ import {
   Picker,
   ScrollView,
   Button,
-  TouchableOpacity
+  TouchableOpacity,
+  Navigator
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Octicons';
 

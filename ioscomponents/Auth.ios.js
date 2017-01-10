@@ -68,7 +68,7 @@ export default class Auth extends Component {
                             this._onValueChange(STORAGE_KEY, res.token);
                             this.props.getToken();
 
-                            this.props.navigator.push({ident: 'UserView', sceneConfig: Navigator.SceneConfigs.FloatFromBottom});
+                            this.props.navigator.push({ident: 'UserView', sceneConfig: Navigator.SceneConfigs.FloatFromBottom, gestures: {}});
                           }
 
                         })
