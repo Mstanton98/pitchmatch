@@ -27,21 +27,21 @@ router.get('/api/matches', authorize, (req, res, next) => {
   const id = req.token.userId;
 
   return knex('user_matches')
-    .innerJoin('users', 'users.id', 'user_matches.match_id')
-    .where('user_id', id)
-    .andWhere('is_match', true)
-    .then((rows) => {
-      const matches = camelizeKeys(rows);
+  .innerJoin('users', 'users.id', 'user_matches.match_id')
+  .where('user_id', id)
+  .andWhere('is_match', true)
+  .then((rows) => {
+    const matches = camelizeKeys(rows);
 
-      for (let i = 0; i < matches.length; i++) {
-        delete matches[i].facebookToken;
-      }
+    for (let i = 0; i < matches.length; i++) {
+      delete matches[i].facebookToken;
+    }
 
-      res.send(matches);
-    })
-    .catch((err) => {
-      next(err);
-    });
+    res.send(matches);
+  })
+  .catch((err) => {
+    next(err);
+  });
 });
 
 router.post('/api/matches', authorize, (req, res, next) => {
@@ -49,54 +49,54 @@ router.post('/api/matches', authorize, (req, res, next) => {
   const matchId = req.body.matchId;
 
   knex('user_matches')
-    .where('match_id', id)
-    .andWhere('user_id', matchId)
-    .then((rows) => {
-      if (rows.length !== 0) {
+  .where('match_id', id)
+  .andWhere('user_id', matchId)
+  .then((rows) => {
+    if (rows.length !== 0) {
 
-        return knex('user_matches')
-          .where('match_id', id)
-          .andWhere('user_id', matchId)
-          .update({'is_match': true})
-          .then(() => {
+      return knex('user_matches')
+      .where('match_id', id)
+      .andWhere('user_id', matchId)
+      .update({'is_match': true})
+      .then(() => {
 
-            knex('user_matches')
-              .insert(decamelizeKeys({
-                userId: id,
-                matchId: matchId,
-                isMatch: true
-              }))
-              .then((row) => {
+        knex('user_matches')
+        .insert(decamelizeKeys({
+          userId: id,
+          matchId: matchId,
+          isMatch: true
+        }))
+        .then((row) => {
 
-                res.send(true);
-              })
-              .catch((err) => {
-                next(err);
-              });
-          })
-          .catch((err) => {
-            next(err);
-          });
-      }
-      else {
-        return knex('user_matches')
-          .insert(decamelizeKeys({
-            userId: id,
-            matchId: matchId,
-            isMatch: false
-          }))
-          .then((response) => {
+          res.send(true);
+        })
+        .catch((err) => {
+          next(err);
+        });
+      })
+      .catch((err) => {
+        next(err);
+      });
+    }
+    else {
+      return knex('user_matches')
+      .insert(decamelizeKeys({
+        userId: id,
+        matchId: matchId,
+        isMatch: false
+      }))
+      .then((response) => {
 
-            res.send(false);
-          })
-          .catch((err) => {
-            next(err);
-          });
-      }
-    })
-    .catch((err) => {
-      next(err)
-    });
+        res.send(false);
+      })
+      .catch((err) => {
+        next(err);
+      });
+    }
+  })
+  .catch((err) => {
+    next(err)
+  });
 });
 
 router.delete('/api/matches', authorize, (req, res, next) => {
@@ -105,31 +105,31 @@ router.delete('/api/matches', authorize, (req, res, next) => {
   const match = {};
 
   knex('user_matches')
+  .where('user_id', id)
+  .andWhere('match_id', matchId)
+  .orWhere('user_id', matchId)
+  .andWhere('match_id', id)
+  .then((response) => {
+    if (!response) {
+      return boom.create(404, 'Match not found.')
+    }
+
+    match.userId = id;
+    match.matchId = matchId;
+
+    return knex('user_matches')
+    .del()
     .where('user_id', id)
     .andWhere('match_id', matchId)
     .orWhere('user_id', matchId)
     .andWhere('match_id', id)
-    .then((response) => {
-      if (!response) {
-        return boom.create(404, 'Match not found.')
-      }
-
-      match.userId = id;
-      match.matchId = matchId;
-
-      return knex('user_matches')
-        .del()
-        .where('user_id', id)
-        .andWhere('match_id', matchId)
-        .orWhere('user_id', matchId)
-        .andWhere('match_id', id)
-    })
-    .then(() => {
-      res.send((camelizeKeys(match)));
-    })
-    .catch((err) => {
-      next(err);
-    });
+  })
+  .then(() => {
+    res.send((camelizeKeys(match)));
+  })
+  .catch((err) => {
+    next(err);
+  });
 });
 
 module.exports = router;

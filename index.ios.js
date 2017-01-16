@@ -1,8 +1,8 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
+* Sample React Native App
+* https://github.com/facebook/react-native
+* @flow
+*/
 
 import React, { Component } from 'react';
 import StatusBar from './ioscomponents/StatusBar'
@@ -20,7 +20,7 @@ export default class pitchmatch extends Component {
       <View style={styles.container}>
         <StatusBar />
         <Main />
-
+        
       </View>
     );
   }

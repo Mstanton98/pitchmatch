@@ -161,7 +161,7 @@ export default class EditProfile extends Component {
                     >
                       <Text style={styles.buttonText}>
                         Back to login
-                    </Text>
+                      </Text>
                     </TouchableOpacity>
                   </ScrollView>
                 </ScrollView>
@@ -213,7 +213,9 @@ export default class EditProfile extends Component {
               alignSelf: 'center'
             },
             projectType: {
-              width: 400
+              width: 400,
+              marginLeft: 30,
+              marginRight: 30
             },
             label: {
               fontSize: 18,

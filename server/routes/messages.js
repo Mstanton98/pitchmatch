@@ -29,18 +29,18 @@ router.post('/api/messagesList', authorize, (req, res, next) => {
   console.log(id);
 
   return knex('user_messages')
-    .where('user_id', id)
-    .andWhere('match_id', matchId)
-    orWhere('match_id', id)
-    andWhere('user_id', matchId)
-    .then((response) => {
-      const messages = camelizeKeys(response);
+  .where('user_id', id)
+  .andWhere('match_id', matchId)
+  orWhere('match_id', id)
+  andWhere('user_id', matchId)
+  .then((response) => {
+    const messages = camelizeKeys(response);
 
-      res.send(messages);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+    res.send(messages);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 });
 
 router.post('/api/messages', authorize, (req, res, next) => {
@@ -49,32 +49,32 @@ router.post('/api/messages', authorize, (req, res, next) => {
   const message = req.body.message;
 
   return knex('user_messages')
-    .insert(decamelizeKeys({
-      userId: id,
-      matchId: recipientId,
-      messageBody: message
-    }))
-    .then((response) => {
+  .insert(decamelizeKeys({
+    userId: id,
+    matchId: recipientId,
+    messageBody: message
+  }))
+  .then((response) => {
 
-      return knex('user_messages')
-        .where('user_id', id)
-        .andWhere('match_id', recipientId)
-        .then((rows) => {
-          const messages = camelizeKeys(rows);
+    return knex('user_messages')
+    .where('user_id', id)
+    .andWhere('match_id', recipientId)
+    .then((rows) => {
+      const messages = camelizeKeys(rows);
 
-          for (let i = 0; i < messages.length; i++) {
-            delete messages[i].facebookToken;
-          }
+      for (let i = 0; i < messages.length; i++) {
+        delete messages[i].facebookToken;
+      }
 
-          res.send(messages);
-        })
-        .catch((err) => {
-          next(err);
-        });
+      res.send(messages);
     })
     .catch((err) => {
       next(err);
     });
+  })
+  .catch((err) => {
+    next(err);
+  });
 });
 
 router.delete('/api/messages', authorize, (req, res, next) => {
@@ -83,27 +83,27 @@ router.delete('/api/messages', authorize, (req, res, next) => {
   const messages = {};
 
   knex('user_messages')
+  .where('user_id', id)
+  .andWhere('match_id', recipientId)
+  .then((response) => {
+    if (!response) {
+      return boom.create(404, 'No messages from this user.')
+    }
+
+    messages.userId = id;
+    messages.matchId = recipientId;
+
+    return knex('user_messages')
+    .del()
     .where('user_id', id)
     .andWhere('match_id', recipientId)
-    .then((response) => {
-      if (!response) {
-        return boom.create(404, 'No messages from this user.')
-      }
-
-      messages.userId = id;
-      messages.matchId = recipientId;
-
-      return knex('user_messages')
-        .del()
-        .where('user_id', id)
-        .andWhere('match_id', recipientId)
-    })
-    .then(() => {
-      res.send((camelizeKeys(messages)));
-    })
-    .catch((err) => {
-      next(err);
-    });
+  })
+  .then(() => {
+    res.send((camelizeKeys(messages)));
+  })
+  .catch((err) => {
+    next(err);
+  });
 });
 
 module.exports = router;

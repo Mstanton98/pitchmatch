@@ -83,32 +83,32 @@ export default class Auth extends Component {
               onLogoutFinished={() => this.props.delToken()}
             />
           </ScrollView>
-          </View>
-        );
-      }
+        </View>
+      );
     }
+  }
 
-    const styles = StyleSheet.create({
-      container: {
-        flex: 1,
-        alignItems: 'center',
-        backgroundColor: 'white',
-        height: 800
-      },
-      title: {
-        fontSize: 48,
-        color: '#70587B'
-      },
-      description: {
-        fontSize: 12,
-        color: 'grey',
-      },
-      logo: {
-        alignItems: 'center',
-        height: 300,
-        width: 300,
-        marginBottom: 10,
-      }
-    });
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: 'center',
+      backgroundColor: 'white',
+      height: 800
+    },
+    title: {
+      fontSize: 48,
+      color: '#70587B'
+    },
+    description: {
+      fontSize: 12,
+      color: 'grey',
+    },
+    logo: {
+      alignItems: 'center',
+      height: 300,
+      width: 300,
+      marginBottom: 10,
+    }
+  });
 
-    module.exports = Auth;
+  module.exports = Auth;

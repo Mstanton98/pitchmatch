@@ -29,15 +29,15 @@ const authorize = function(req, res, next) {
 
 router.patch('/api/details', authorize, (req, res, next) => {
   return knex('users')
-    .where('id', req.body.userId)
-    .update({bio: req.body.bio, instruments: req.body.instruments, project_type: req.body.projectType})
-    .then((response) => {
+  .where('id', req.body.userId)
+  .update({bio: req.body.bio, instruments: req.body.instruments, project_type: req.body.projectType})
+  .then((response) => {
 
-      res.send(true);
-    })
-    .catch((err) => {
-      next(err);
-    });
+    res.send(true);
+  })
+  .catch((err) => {
+    next(err);
+  });
 });
 
 router.post('/api/auth', (req, res, next) => {
@@ -104,8 +104,8 @@ router.post('/api/auth', (req, res, next) => {
 
 router.get('/api/users', authorize, (req, res, next) => {
   const subquery = knex('user_matches')
-    .select('match_id')
-    .where('user_id', req.token.userId);
+  .select('match_id')
+  .where('user_id', req.token.userId);
 
   knex('users')
   .whereNotIn('id', subquery)

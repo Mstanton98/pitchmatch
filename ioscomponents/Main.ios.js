@@ -31,6 +31,7 @@ export default class Main extends Component {
     this.getInfo = this.getInfo.bind(this);
     this.getMatches = this.getMatches.bind(this);
     this.userUpdate = this.userUpdate.bind(this);
+    // this.getMessages = this.getMessages.bind(this);
     this.onPress = this.onPress.bind(this);
     this.onPress2 = this.onPress2.bind(this);
   }
@@ -114,8 +115,8 @@ export default class Main extends Component {
   }
 
   userUpdate() {
-
     let newArr = [...this.state.users];
+
     newArr.pop();
     this.setState({ users: newArr });
   }
@@ -138,72 +139,72 @@ export default class Main extends Component {
           configureScene={(route) => ({
             ...route.sceneConfig || Navigator.SceneConfigs.FloatFromRight,
             gestures: route.gestures
-           }
-          )}
-          renderScene={(route, navigator) => {
-            if (route.ident === 'Auth') {
-              return <Auth
-                navigator={navigator}
-                token={this.state.accessToken}
-                getToken={this.getToken}
-                delToken={this.delToken}
-              />;
-            }
-            if (route.ident === 'EditProfile') {
-              return <EditProfile
-                navigator={navigator}
-                user={this.state.userInfo}
-                token={this.state.accessToken}
-                delToken={this.delToken}
-                getUsers={this.getUsers}
-                getInfo={this.getInfo}
-              />;
-            }
-            if (this.state.accessToken && route.ident === 'UserView') {
-              return <UserView
-                navigator={navigator}
-                user={this.state.userInfo}
-                users={this.state.users}
-                userUpdate={this.userUpdate}
-                matches={this.state.matches}
-                token={this.state.accessToken}
-                getUsers={this.getUsers}
-                getMatches={this.getMatches}
-                getInfo={this.getInfo}
-              />;
-            }
-            if (route.ident === 'MatchList') {
-              return <MatchList
-                navigator={navigator}
-                user={this.state.userInfo}
-                token={this.state.accessToken}
-                matches={this.state.matches}
-                getUsers={this.getUsers}
-                getInfo={this.getInfo}
-              />;
-            }
-            if (route.ident === 'ChatView') {
-              return <ChatView
-                user={route.user}
-              />
-            }
+          }
+        )}
+        renderScene={(route, navigator) => {
+          if (route.ident === 'Auth') {
+            return <Auth
+              navigator={navigator}
+              token={this.state.accessToken}
+              getToken={this.getToken}
+              delToken={this.delToken}
+            />;
+          }
+          if (route.ident === 'EditProfile') {
+            return <EditProfile
+              navigator={navigator}
+              user={this.state.userInfo}
+              token={this.state.accessToken}
+              delToken={this.delToken}
+              getUsers={this.getUsers}
+              getInfo={this.getInfo}
+            />;
+          }
+          if (this.state.accessToken && route.ident === 'UserView') {
+            return <UserView
+              navigator={navigator}
+              user={this.state.userInfo}
+              users={this.state.users}
+              userUpdate={this.userUpdate}
+              matches={this.state.matches}
+              token={this.state.accessToken}
+              getUsers={this.getUsers}
+              getMatches={this.getMatches}
+              getInfo={this.getInfo}
+            />;
+          }
+          if (route.ident === 'MatchList') {
+            return <MatchList
+              navigator={navigator}
+              user={this.state.userInfo}
+              token={this.state.accessToken}
+              matches={this.state.matches}
+              getUsers={this.getUsers}
+              getInfo={this.getInfo}
+            />;
+          }
+          if (route.ident === 'ChatView') {
+            return <ChatView
+              user={route.user}
+            />
+          }
           if (route.ident === 'MatchNotification') {
             return <ScrollView style={styles.notificationCont}>
-                <Text style={{fontFamily: 'Avenir', fontSize: 30, alignSelf: 'center'}}>You matched with {route.firstName}!</Text>
-                <Image style={styles.userImg} source={{uri: route.imgUrl }} />
-                <TouchableOpacity style={styles.notification} onPress={this.onPress}>
-                  <Text style={styles.button}>Check them out</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.notification2} onPress={this.onPress2}>
-                  <Text style={styles.button2}>Go Away</Text>
-                </TouchableOpacity>
-              </ScrollView>
-            }
-          }}
-        />
-      </View>
-    )
-  }
+              <Text style={{fontFamily: 'Avenir', fontSize: 30, alignSelf: 'center'}}>You matched with {route.firstName}!</Text>
+              <Image style={styles.userImg} source={{uri: route.imgUrl }} />
+              <TouchableOpacity style={styles.notification} onPress={this.onPress}>
+                <Text style={styles.button}>Check them out</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.notification2} onPress={this.onPress2}>
+                <Text style={styles.button2}>Go Away</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          }
+        }}
+      />
+    </View>
+  )
+}
 }
 
 const styles = StyleSheet.create({
